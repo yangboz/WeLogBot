@@ -1,0 +1,1 @@
+const { Wechaty, Message } = require('wechaty');
