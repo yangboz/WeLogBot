@@ -5,6 +5,8 @@ Log WeChat messages to message broker, then broadcast to Wordpress, message brok
 
 https://github.com/yjhjstz/deep-into-node/tree/master/chapter10
 
+https://github.com/rmohr/docker-activemq
+
 https://github.com/gdaws/node-stomp
 
 https://github.com/WP-API/node-wpapi
