@@ -6,13 +6,33 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "config": "^1.25.1",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.16.0",
     "http-errors": "~1.6.2",
     "jade": "~1.11.0",
     "morgan": "~1.9.0",
-    "config": "^1.25.1",
+    "request": "^2.85.0",
     "wechaty": "^0.7.17"
-  }
+  },
+  "description": "WeLogBot",
+  "main": "app.js",
+  "bin": {
+    "welogbot": "index.js"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yangboz/WeLogBot.git"
+  },
+  "keywords": [
+    "WeLogBot"
+  ],
+  "author": "yangboz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yangboz/WeLogBot/issues"
+  },
+  "homepage": "https://github.com/yangboz/WeLogBot#readme"
 }
