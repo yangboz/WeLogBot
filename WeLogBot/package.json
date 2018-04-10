@@ -14,7 +14,8 @@
     "jade": "~1.11.0",
     "morgan": "~1.9.0",
     "request": "^2.85.0",
-    "wechaty": "^0.7.17"
+    "wechaty": "^0.7.17",
+    "wpapi": ""
   },
   "description": "WeLogBot",
   "main": "app.js",

@@ -16,3 +16,5 @@ https://github.com/Chatie/wechaty
 https://github.com/lijiarui/wechaty-getting-started
 
 https://github.com/luosheng/Wegram
+
+https://github.com/NaturalNode/natural

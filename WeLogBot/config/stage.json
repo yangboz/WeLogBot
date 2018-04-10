@@ -1,0 +1,10 @@
+{
+// Environment variables containing multiple configs
+  "ENV": {
+    "wordpress": {
+      "host": "http://167.99.69.22/",
+      "username": "user",
+      "password": "bitnami"
+    }
+  }
+}

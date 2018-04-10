@@ -34,19 +34,19 @@ server.on('listening', onListening);
  */
 
 function normalizePort(val) {
-  var port = parseInt(val, 10);
+    var port = parseInt(val, 10);
 
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
 
-  if (port >= 0) {
-    // port number
-    return port;
-  }
+    if (port >= 0) {
+        // port number
+        return port;
+    }
 
-  return false;
+    return false;
 }
 
 /**
@@ -54,27 +54,27 @@ function normalizePort(val) {
  */
 
 function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+    var bind = typeof port === 'string'
+        ? 'Pipe ' + port
+        : 'Port ' + port;
 
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    default:
-      throw error;
-  }
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            console.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
 }
 
 /**
@@ -82,9 +82,113 @@ function onError(error) {
  */
 
 function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+    var addr = server.address();
+    var bind = typeof addr === 'string'
+        ? 'pipe ' + addr
+        : 'port ' + addr.port;
+    debug('Listening on ' + bind);
 }
+
+
+const { Wechaty, Room } = require('wechaty')
+var request = require('request');
+//
+process.env.NODE_CONFIG_ENV = "development";
+// process.env.NODE_CONFIG_ENV = "test";
+// process.env.NODE_ENV = "stage";
+//@see: https://github.com/lorenwest/node-config
+var config = require('config');
+console.log('NODE_CONFIG_DIR: ' + config.util.getEnv('NODE_CONFIG_DIR'));
+console.log('NODE_ENV: ' + config.util.getEnv('NODE_ENV'));
+console.log('NODE_ENV_VAR: ' + config.get('ENV.wordpress.host'));
+//
+Wechaty.instance()
+    .on('scan', (url, code) => {
+        if (!/201|200/.test(String(code))) {
+            const loginUrl = url.replace(/\/qrcode\//, '/l/')
+            require('qrcode-terminal').generate(loginUrl)
+        }
+        console.log(url)
+    })
+
+    .on('login', user => {
+        console.log(`${user} login`)
+    })
+
+    .on('friend', async function (contact, request) {
+        if (request) {
+            await request.accept()
+            console.log(`Contact: ${contact.name()} send request ${request.hello}`)
+        }
+    })
+
+    .on('message', async function (m) {
+        const contact = m.from()
+        const content = m.content()
+        const room = m.room()
+        console.log(contact,content,room);
+        //https://github.com/WP-API/node-wpapi
+        //test: http://ec2-54-242-70-146.compute-1.amazonaws.com/
+        //stage: http://167.99.69.22/
+        var WPAPI = require( 'wpapi' );
+        var wp = new WPAPI({
+                endpoint: config.get('ENV.wordpress.host') + '/wp-json',
+                // This assumes you are using basic auth, as described further below
+                username: config.get('ENV.wordpress.username'),
+                password: config.get('ENV.wordpress.password')
+            }
+        );
+
+        if (room) {
+            console.log(`Room: ${room.topic()} Contact: ${contact.name()} Content: ${content}`)
+            //WP api testing code,@see: https://github.com/WP-API/node-wpapi
+            if (content.indexOf("#WL#")!=-1) {
+                //@see: https://developer.wordpress.org/rest-api/reference/
+                wp.posts().create({
+                    // "title" and "content" are the only required properties
+                    title: "Room:" +room.topic(),
+                    author:contact.name,
+                    //TODO: NLP,https://github.com/NaturalNode/natural
+                    content: content,
+                    // Post will be created as a draft by default if a specific "status"
+                    // is not specified
+                    status: 'publish'
+                }).then(function (response) {
+                    // "response" will hold all properties of your newly-created post,
+                    // including the unique `id` the post was assigned on creation
+                    console.log(response.id);
+                }).catch(function(err) {
+                    console.log(err);
+                });
+            }
+
+        } else {
+            console.log(`Contact: ${contact.name()} Content: ${content}`)
+        }
+
+        if (m.self()) {
+            return
+        }
+
+        if (/hello/.test(content)) {
+            m.say("hello how are you")
+        }
+
+        if (/room/.test(content)) {
+            let keyroom = await Room.find({ topic: "test" })
+            if (keyroom) {
+                await keyroom.add(contact)
+                await keyroom.say("welcome!", contact)
+            }
+        }
+
+        if (/out/.test(content)) {
+            let keyroom = await Room.find({ topic: "test" })
+            if (keyroom) {
+                await keyroom.say("Remove from the room", contact)
+                await keyroom.del(contact)
+            }
+        }
+    })
+
+    .init()

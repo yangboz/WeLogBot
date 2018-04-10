@@ -1,0 +1,10 @@
+{
+// Environment variables containing multiple configs
+  "ENV": {
+    "wordpress": {
+      "host": "http://ec2-54-242-70-146.compute-1.amazonaws.com/",
+      "username": "user",
+      "password": "bitnami"
+    }
+  }
+}
