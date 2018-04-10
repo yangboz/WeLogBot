@@ -18,3 +18,5 @@ https://github.com/lijiarui/wechaty-getting-started
 https://github.com/luosheng/Wegram
 
 https://github.com/NaturalNode/natural
+
+https://developer.wordpress.org/rest-api/reference/posts/#create-a-post
